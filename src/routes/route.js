@@ -7,7 +7,8 @@ const router = Router();
 // Register route
 router.post("/register", async (req, res) => {
   try {
-    const { email, ...rest } = req.body;
+    const payload = req.body;
+    const { email } = payload;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -16,10 +17,9 @@ router.post("/register", async (req, res) => {
     }
 
     // Create new user
-    const newUser = new User({ email, ...rest });
+    const newUser = new User(payload);
     await newUser.save();
 
-    // console.log("New user registered:", newUser);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -27,7 +27,36 @@ router.post("/register", async (req, res) => {
     });
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({error: error, message: "Server error" });
+  }
+});
+
+// Login route
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if email exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    // Check password
+    if (user.password !== password) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const { password: _, ...userWithoutPassword } = user.toObject();
+    
+    // Success
+    res.status(200).json({
+      message: "Login successful",
+      user: userWithoutPassword,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: error, message: "Server error" });
   }
 });
 
