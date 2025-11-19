@@ -7,7 +7,11 @@ const userSchema = new Schema({
   gender: String,
   dateOfBirth: Date,
   password: { type: String, required: true },
-});
+},
+  {
+    versionKey: false,
+    timestamps: true,
+  });
 
 
 export  const User = model("User", userSchema);

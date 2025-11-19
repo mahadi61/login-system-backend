@@ -60,6 +60,20 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Get all users
+router.get("/all-users", async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0 });
+
+    res.status(200).json({
+      message: "All users fetched successfully",
+      users: users,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: error, message: "Server error" });
+  }
+});
 
 
 export default router;
